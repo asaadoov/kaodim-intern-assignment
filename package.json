@@ -4,11 +4,12 @@
   "description": "simple web app that matches a job request with a vendor",
   "main": "server.js",
   "scripts": {
-    "client-install":"npm install --prefix client",
+    "client-install": "npm install --prefix client",
     "start": "node server.js",
     "server": "nodemon server.js",
     "client": "npm start --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm start\" \"npm run client\"",
+    "heorku-postbuild": "NPM_CONFIG_PRODUCTION=flase npm install --prefix client && npm run build --prefix client"
   },
   "author": "Asaad Balla",
   "license": "ISC",

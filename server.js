@@ -2,10 +2,9 @@
 const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql");
-
+const path = require("path");
 // Server Configuration
 const app = express();
-const PORT = process.env.PORT || 2098;
 
 app.use(cors());
 
@@ -65,19 +64,32 @@ function checkMatch(date, location) {
   );
 }
 
-getSummary = () => {
-  const SELECT_SUMMARY = `
-    SELECT DISTINCT vendorId,vendorName,userEmail, jobrequest.location, jobDate,jobAssigned , vendorAssigned
-    FROM vendors, jobrequest
-    WHERE vendors.location=jobrequest.location AND vendors.availability=jobrequest.jobDate ORDER BY jobDate;`;
-
-  kaodimSqlDB.query(SELECT_SUMMARY, (error, results) => {
-    if (error) console.log(error);
-    else console.table(results);
-  });
-};
-
+// @In case the Developer want to get a summary of the DB
+{
+  // getSummary = () => {
+  //   const SELECT_SUMMARY = `
+  //     SELECT DISTINCT vendorId,vendorName,userEmail, jobrequest.location, jobDate,jobAssigned , vendorAssigned
+  //     FROM vendors, jobrequest
+  //     WHERE vendors.location=jobrequest.location AND vendors.availability=jobrequest.jobDate ORDER BY jobDate;`;
+  //   kaodimSqlDB.query(SELECT_SUMMARY, (error, results) => {
+  //     if (error) console.log(error);
+  //     else console.table(results);
+  //   });
+  // };
+}
 app.get("/", (req, res) => res.redirect("http://localhost:3000"));
+
+// serve the static assets if in production
+if (process.env.NODE_ENV === "production") {
+  // Setting the static folder
+  app.use(express.static("client/build"));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
+
+const PORT = process.env.PORT || 2098;
 
 app.listen(PORT, () => {
   console.log(`The Server is running on PORT ${PORT}...`);

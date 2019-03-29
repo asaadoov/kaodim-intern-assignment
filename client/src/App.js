@@ -14,7 +14,7 @@ class App extends Component {
         <Container>
           <InputForm />
         </Container>
-        <AppFooter/>
+        <AppFooter />
       </div>
     );
   }
