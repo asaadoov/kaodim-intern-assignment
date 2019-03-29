@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { locations } from "./Store";
-
 import {
   Form,
   FormGroup,
@@ -22,78 +21,19 @@ class InputForm extends Component {
     dropdownOpen: false,
     isFormSubmitted: false
   };
+
+  // LifeCycleMethods
   componentDidMount() {
     this.load();
   }
 
+  // Controlling render functions
   load = () => {
     if (this.state.isFormSubmitted) return this.renderThankYou();
     else return this.renderForm();
   };
 
-  onLocationChange = e => {
-    // value of the location input
-    const value = e.target.value;
-
-    let suggestions = [];
-    if (value.length > 0) {
-      const regex = new RegExp(`^${value}`, "i");
-      suggestions = locations.sort().filter(place => regex.test(place));
-    }
-    // enter space to show all the available locations
-    if (value === " ") {
-      suggestions = locations.sort();
-    }
-    this.setState({ suggestions, location: value });
-  };
-
-  renderSuggestions() {
-    const { suggestions } = this.state;
-    if (suggestions.length === 0) return null;
-    return (
-      <ListGroup>
-        {suggestions.map(place => (
-          <ListGroupItem
-            tag="li"
-            action
-            className="text-primary"
-            style={{ cursor: "pointer" }}
-            onClick={() =>
-              this.setState(() => ({ location: place, suggestions: [] }))
-            }
-          >
-            {place}
-          </ListGroupItem>
-        ))}
-      </ListGroup>
-    );
-  }
-
-  formSubmitted = e => {
-    e.preventDefault();
-    this.setState({ isFormSubmitted: true });
-    this.load();
-    // TODO: send the data to the server
-    axios
-      .get("http://localhost:2098/jobrequest/add", {
-        params: {
-          email: `${this.state.email}`,
-          date: `${this.state.date}`,
-          location: `${this.state.location}`
-        }
-      })
-      .then(function(response) {
-        console.log("Form is Submitted");
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
-  };
-
-  onChange = e => {
-    this.setState({ [e.target.name]: [e.target.value] });
-  };
-
+  // 1- renderForm
   renderForm = () => {
     const { email, location, date } = this.state;
     return (
@@ -161,8 +101,87 @@ class InputForm extends Component {
     );
   };
 
+  // 2- renderSuggestions
+  renderSuggestions() {
+    const { suggestions } = this.state;
+    if (suggestions.length === 0) return null;
+    return (
+      <ListGroup>
+        {suggestions.map(place => (
+          <ListGroupItem
+            tag="li"
+            action
+            className="text-primary"
+            style={{ cursor: "pointer" }}
+            onClick={() =>
+              // an arrow function that will set the value of a selected location
+              // as well as hiding the rest of the locations
+              this.setState(() => ({ location: place, suggestions: [] }))
+            }
+          >
+            {place}
+          </ListGroupItem>
+        ))}
+      </ListGroup>
+    );
+  }
+
+  // 3- render a msg after the submission of the form
   renderThankYou = () => {
-    return <h3 className="text-info text-center"> Thank you for choosing our service </h3>;
+    return (
+      <h3 className="text-info text-center">
+        Thank you for choosing our service. <br /> Stay tuned for the other
+        services.
+      </h3>
+    );
+  };
+
+  //Handling events
+  // 1-handling the change of the email and date inputs
+  onChange = e => {
+    this.setState({ [e.target.name]: [e.target.value] });
+  };
+
+  // 2-handling the change of the location input
+  onLocationChange = e => {
+    // value of the location input
+    const value = e.target.value;
+
+    let suggestions = [];
+    if (value.length > 0) {
+      // Regular Expression is used to get the matching locations
+      const regex = new RegExp(`^${value}`, "i");
+      suggestions = locations.sort().filter(place => regex.test(place));
+    }
+    // enter space to show all the available locations
+    if (value === " ") {
+      suggestions = locations.sort();
+    }
+    this.setState({ suggestions, location: value });
+  };
+
+  // 3- handling the submission of the form
+  formSubmitted = e => {
+    e.preventDefault();
+
+    this.setState({ isFormSubmitted: true });
+    this.load();
+
+    // TODO: send the data to the server using axios pkg
+    axios
+      .get("http://localhost:2098/jobrequest/add", {
+        params: {
+          email: `${this.state.email}`,
+          date: `${this.state.date}`,
+          location: `${this.state.location}`
+        }
+      })
+      .then(function(response) {
+        console.log("Form is Submitted");
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
   };
 
   render() {

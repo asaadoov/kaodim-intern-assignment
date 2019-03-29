@@ -4,7 +4,7 @@ import "./App.css";
 import AppNavbar from "./components/AppNavbar";
 import InputForm from "./components/InputForm";
 import { Container } from "reactstrap";
-import AppFooter from "./AppFooter";
+import AppFooter from "./components/AppFooter";
 
 class App extends Component {
   render() {
