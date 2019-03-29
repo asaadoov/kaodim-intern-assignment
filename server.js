@@ -8,7 +8,7 @@ const app = express();
 
 app.use(cors());
 
-// mySQL connection
+// MySQL connection
 const kaodimSqlDB = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -20,7 +20,8 @@ kaodimSqlDB.connect(error => {
   if (error) return console.log(error);
 });
 
-// Add job Request
+// @Method  Get '/jobrequest/add'
+// @Desc    Adding a job Request
 app.get("/jobrequest/add", (req, res) => {
   const { email, date, location } = req.query || {
     email: "a@test.com",
@@ -35,13 +36,12 @@ app.get("/jobrequest/add", (req, res) => {
     if (error) return res.send(error);
     else {
       checkMatch(date, location);
-      console.log(results);
-      return res.send("successfully inserted job request");
+      console.table(results, "\n successfully inserted job request");
     }
   });
 });
 
-// check for match
+// check for a match
 function checkMatch(date, location) {
   // UPDATE queries
   kaodimSqlDB.query(
@@ -64,7 +64,8 @@ function checkMatch(date, location) {
   );
 }
 
-// @In case the Developer want to get a summary of the DB
+// @In case the Developer want to get a summary of the DB inside the terminal
+// uncomment the code inside the curly bracets
 {
   // getSummary = () => {
   //   const SELECT_SUMMARY = `
@@ -76,19 +77,22 @@ function checkMatch(date, location) {
   //     else console.table(results);
   //   });
   // };
+  // getSummary ();
 }
+// in the devlopment mode this line of code is nused to redirect a visit to port 2098
 app.get("/", (req, res) => res.redirect("http://localhost:3000"));
 
 // serve the static assets if in production
 if (process.env.NODE_ENV === "production") {
   // Setting the static folder
   app.use(express.static("client/build"));
-
+  //loading the index.html(react js)
   app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
   });
 }
 
+// process.env.PORT is used by Heroku
 const PORT = process.env.PORT || 2098;
 
 app.listen(PORT, () => {
